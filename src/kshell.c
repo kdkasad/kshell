@@ -72,9 +72,8 @@ void kshell_loop(FILE *f)
 	int status;
 
 	do {
-		/* only print prompt if reading from stdin */
-		TODO("only print prompt if reading from terminal");
-		if (f == stdin)
+		/* only print prompt if reading from a terminal */
+		if (isatty(fileno(f)))
 			printf("> ");
 		line = kshell_read_line(f);
 		if (!line)
