@@ -1,5 +1,6 @@
 #define _XOPEN_SOURCE 700
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,11 +9,12 @@
 #include <unistd.h>
 
 #include "builtins/builtins.h"
+#include "macros.h"
 
 static int kshell_execute(char **args);
 static int kshell_launch(char **args);
-static void kshell_loop();
-static char *kshell_read_line();
+static void kshell_loop(FILE *f);
+static char *kshell_read_line(FILE *f);
 static char **kshell_split_line(char *line);
 
 /*
@@ -63,15 +65,18 @@ int kshell_launch(char **args)
 /*
  * Main program loop
  */
-void kshell_loop()
+void kshell_loop(FILE *f)
 {
 	char *line;
 	char **args;
 	int status;
 
 	do {
-		printf("> ");
-		line = kshell_read_line();
+		/* only print prompt if reading from stdin */
+		TODO("only print prompt if reading from terminal");
+		if (f == stdin)
+			printf("> ");
+		line = kshell_read_line(f);
 		args = kshell_split_line(line);
 		status = kshell_launch(args);
 
@@ -85,7 +90,7 @@ void kshell_loop()
  *
  * Returned string must be freed.
  */
-char *kshell_read_line()
+char *kshell_read_line(FILE *f)
 {
 #define RL_BUFFER_SIZE 1024
 
@@ -100,7 +105,7 @@ char *kshell_read_line()
 	}
 
 	for (;;) {
-		c = getchar();
+		c = getc(f);
 
 		/*
 		 * If end of line is reached, terminate the buffer with a NUL
@@ -172,7 +177,19 @@ char **kshell_split_line(char *line)
 
 int main(int argc, char *argv[])
 {
-	kshell_loop();
+	FILE *f = NULL;
+
+	if (argc > 1) {
+		f = fopen(argv[1], "r");
+		if (!f) {
+			fprintf(stderr, "unable to open file: %s\n", strerror(errno));
+			return 1;
+		}
+	} else {
+		f = stdin;
+	}
+
+	kshell_loop(f);
 
 	return EXIT_SUCCESS;
 }
