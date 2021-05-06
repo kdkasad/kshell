@@ -9,9 +9,9 @@
 int kshell_builtin_cd(char **args)
 {
 	if (!args[1]) {
-		fprintf(stderr, "kshell: cd: expected argument\n");
+		fprintf(stderr, PROGNAME": cd: expected argument\n");
 	} else if (chdir(args[1]) < 0) {
-		perror("kshell: cd");
+		perror(PROGNAME": cd");
 	}
 
 	return 0;

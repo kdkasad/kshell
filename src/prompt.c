@@ -32,7 +32,7 @@ char *get_prompt_text()
 
 		/* store current directory into prompt */
 		if (getcwd(prompt, PATH_MAX - 4) == NULL) {
-			perror("kshell: getcwd");
+			perror(PROGNAME": getcwd");
 			prompt[0] = '\0';
 		}
 

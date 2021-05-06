@@ -28,11 +28,11 @@ int kshell_execute(char **args)
 	pid = fork();
 	if (pid == 0) { /* child process */
 		if (execvp(args[0], args) == -1) {
-			perror("kshell: execvp");
+			perror(PROGNAME": execvp");
 		}
 		exit(EXIT_FAILURE);
 	} else if (pid < 0) { /* error forking */
-		perror("kshell: fork");
+		perror(PROGNAME": fork");
 		exit(EXIT_FAILURE);
 	} else { /* parent process */
 		int status;
@@ -110,7 +110,7 @@ char *kshell_read_line(FILE *f)
 	int c;
 
 	if (!buffer) {
-		perror("kshell: malloc");
+		perror(PROGNAME": malloc");
 		exit(EXIT_FAILURE);
 	}
 
@@ -141,7 +141,7 @@ char *kshell_read_line(FILE *f)
 			bufsize += RL_BUFFER_SIZE;
 			buffer = realloc(buffer, bufsize);
 			if (!buffer) {
-				perror("kshell: realloc");
+				perror(PROGNAME": realloc");
 				exit(EXIT_FAILURE);
 			}
 		}
@@ -163,7 +163,7 @@ char **kshell_split_line(char *line)
 	char *token;
 
 	if (!tokens) {
-		perror("kshell: malloc");
+		perror(PROGNAME": malloc");
 		exit(EXIT_FAILURE);
 	}
 
@@ -175,7 +175,7 @@ char **kshell_split_line(char *line)
 			bufsize += SL_BUFFER_SIZE;
 			tokens = realloc(tokens, bufsize);
 			if (!tokens) {
-				perror("kshell: realloc");
+				perror(PROGNAME": realloc");
 				exit(EXIT_FAILURE);
 			}
 		}
