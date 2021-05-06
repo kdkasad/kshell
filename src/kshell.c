@@ -10,6 +10,7 @@
 
 #include "builtins/builtins.h"
 #include "macros.h"
+#include "prompt.h"
 
 static int kshell_execute(char **args);
 static int kshell_launch(char **args);
@@ -69,20 +70,28 @@ void kshell_loop(FILE *f)
 {
 	char *line;
 	char **args;
+	char *prompt;
 	int status;
 
 	do {
-		/* only print prompt if reading from a terminal */
+		prompt = get_prompt_text();
+
+		/* print prompt if reading from a terminal */
 		if (isatty(fileno(f)))
-			printf("> ");
+			fputs(prompt, stderr);
+
+		/* read line and split into tokens */
 		line = kshell_read_line(f);
 		if (!line)
 			return;
 		args = kshell_split_line(line);
+
+		/* interpret and run the line */
 		status = kshell_launch(args);
 
 		free(line);
 		free(args);
+		free(prompt);
 	} while (!status);
 }
 
