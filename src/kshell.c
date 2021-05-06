@@ -77,6 +77,8 @@ void kshell_loop(FILE *f)
 		if (f == stdin)
 			printf("> ");
 		line = kshell_read_line(f);
+		if (!line)
+			return;
 		args = kshell_split_line(line);
 		status = kshell_launch(args);
 
@@ -118,7 +120,7 @@ char *kshell_read_line(FILE *f)
 			return buffer;
 		} else if (c == EOF) {
 			if (pos == 0)
-				exit(EXIT_SUCCESS);
+				return NULL;
 			buffer[pos] = '\0';
 			return buffer;
 		}
@@ -177,19 +179,21 @@ char **kshell_split_line(char *line)
 
 int main(int argc, char *argv[])
 {
-	FILE *f = NULL;
 
 	if (argc > 1) {
-		f = fopen(argv[1], "r");
-		if (!f) {
-			fprintf(stderr, "unable to open file: %s\n", strerror(errno));
-			return 1;
+		FILE *f;
+		for (int i = 1; i < argc; i++) {
+			f = fopen(argv[i], "r");
+			if (!f) {
+				fprintf(stderr, "unable to open file: %s\n", strerror(errno));
+				return 1;
+			}
+			kshell_loop(f);
+			fclose(f);
 		}
 	} else {
-		f = stdin;
+		kshell_loop(stdin);
 	}
-
-	kshell_loop(f);
 
 	return EXIT_SUCCESS;
 }
