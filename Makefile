@@ -1,33 +1,33 @@
 PREFIX = /usr/local
 
-BIN      := kshell
+PROGNAME := kshell
 SRCDIR   := src
 BUILDDIR := build
 
 CFLAGS  ?= -O2 -g
-CFLAGS  += -Wall -Wextra -pedantic
+CFLAGS  += -Wall -Wextra -pedantic -DPROGNAME=\"$(PROGNAME)\"
 LDFLAGS ?= -s
 
 SRCS := $(wildcard $(SRCDIR)/*.c) $(wildcard $(SRCDIR)/builtins/*.c)
 OBJS := $(patsubst $(SRCDIR)/%.c,$(BUILDDIR)/%.o,$(SRCS))
 
 .PHONY: all
-all: $(BIN)
+all: $(PROGNAME)
 
 .PHONY: clean
 clean:
-	rm -f $(BIN)
+	rm -f $(PROGNAME)
 	rm -rf $(BUILDDIR)
 
 .PHONY: install
 install: all
-	install -Dm0755 $(BIN) $(DESTDIR)$(PREFIX)/bin/$(BIN)
+	install -Dm0755 $(PROGNAME) $(DESTDIR)$(PREFIX)/bin/$(BIN)
 
 .PHONY: uninstall
 uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/bin/$(BIN)
+	rm -f $(DESTDIR)$(PREFIX)/bin/$(PROGNAME)
 
-$(BIN): $(OBJS)
+$(PROGNAME): $(OBJS)
 	$(CC) $(LDFLAGS) $^ $(LOADLIBES) $(LDLIBS) -o $@
 
 $(BUILDDIR) $(BUILDDIR)/builtins:
