@@ -1,29 +1,37 @@
-# BUILD should be either 'release' or 'debug'.
-# It is used to set some CFLAGS and LDFLAGS which are used for optimization or
-# debugging.
-BUILD = debug
-
 PREFIX = /usr/local
 
-CFLAGS = -Wall -Wpedantic $(CFLAGS_$(BUILD))
-LDFLAGS = $(LDFLAGS_$(BUILD))
-CFLAGS_release = -Os
-CFLAGS_debug = -O0 -g
-LDFLAGS_release = -s
+BIN      := kshell
+SRCDIR   := src
+BUILDDIR := build
+
+CFLAGS  ?= -O2 -g
+CFLAGS  += -Wall -Wextra -pedantic
+LDFLAGS ?= -s
+
+SRCS := $(wildcard $(SRCDIR)/*.c) $(wildcard $(SRCDIR)/builtins/*.c)
+OBJS := $(patsubst $(SRCDIR)/%.c,$(BUILDDIR)/%.o,$(SRCS))
 
 .PHONY: all
-all: kshell
-
-kshell: kshell.c
+all: $(BIN)
 
 .PHONY: clean
 clean:
-	rm -f kshell $(wildcard *.o)
+	rm -f $(BIN)
+	rm -rf $(BUILDDIR)
 
 .PHONY: install
 install: all
-	install -Dm0755 kshell $(DESTDIR)$(PREFIX)/bin/kshell
+	install -Dm0755 $(BIN) $(DESTDIR)$(PREFIX)/bin/$(BIN)
 
 .PHONY: uninstall
 uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/bin/kshell
+	rm -f $(DESTDIR)$(PREFIX)/bin/$(BIN)
+
+$(BIN): $(OBJS)
+	$(CC) $(LDFLAGS) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+$(BUILDDIR) $(BUILDDIR)/builtins:
+	mkdir -p $@
+
+$(BUILDDIR)/%.o: $(SRCDIR)/%.c | $(BUILDDIR) $(BUILDDIR)/builtins
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@

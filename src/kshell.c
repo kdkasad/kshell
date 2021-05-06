@@ -7,51 +7,13 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-struct builtin {
-	char *name;
-	int (*func)(char **);
-};
+#include "builtins/builtins.h"
 
-static int kshell_builtin_cd(char **args);
-static int kshell_builtin_exit(char **args);
 static int kshell_execute(char **args);
 static int kshell_launch(char **args);
 static void kshell_loop();
 static char *kshell_read_line();
 static char **kshell_split_line(char *line);
-
-struct builtin builtins[] = {
-	{
-		.name = "cd",
-		.func = &kshell_builtin_cd,
-	},
-	{
-		.name = "exit",
-		.func = &kshell_builtin_exit,
-	},
-};
-
-/*
- * Change directory builtin command
- */
-int kshell_builtin_cd(char **args)
-{
-	if (!args[1]) {
-		fprintf(stderr, "kshell: cd: expected argument\n");
-	} else if (chdir(args[1]) < 0) {
-		perror("kshell: cd");
-	}
-
-	return 0;
-}
-
-/*
- * Exit the shell
- */
-int kshell_builtin_exit(char **args)
-{
-	return -1;
-}
 
 /*
  * Execute a program with the given arguments
@@ -88,7 +50,7 @@ int kshell_launch(char **args)
 		return 0;
 
 	/* if the given command is a builtin, run that function */
-	for (int i = 0; i < sizeof(builtins)/sizeof(builtins[0]); i++) {
+	for (int i = 0; i < num_builtins; i++) {
 		if (!strcmp(args[0], builtins[i].name)) {
 			return builtins[i].func(args);
 		}
