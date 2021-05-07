@@ -1,6 +1,7 @@
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "builtins.h"
@@ -20,6 +21,8 @@ int kshell_builtin_cd(char **args)
 			fputs(PROGNAME": unable to get home directory\n", stderr);
 			return 0;
 		}
+	} else if (!strcmp(args[1], "-")) {
+		dest = getenv("OLDPWD");
 	} else {
 		/* try to go to given directory */
 		dest = args[1];
