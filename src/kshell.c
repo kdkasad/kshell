@@ -184,8 +184,20 @@ char **kshell_split_line(char *line)
 	/* for each token in the line */
 	for (token = strtok(line, SL_TOK_DELIM); token;
 			token = strtok(NULL, SL_TOK_DELIM)) {
-		/* allocate a new string for the token */
-		tokens[pos++] = strdup(token);
+		if (token[0] == '~') {
+			/* replace '~' with home directory */
+			TODO("fall back to getting home dir from passwd db");
+			char *homedir = getenv("HOME");
+			/* no need to allocate extra space for a nul byte
+			 * because the '~' will be removed */
+			tokens[pos] = malloc(strlen(homedir) + strlen(token));
+			strcpy(tokens[pos], homedir);
+			strcat(tokens[pos], token + 1);
+			pos++;
+		} else {
+			/* allocate a new string for the token */
+			tokens[pos++] = strdup(token);
+		}
 
 		/* if the token array is full, reallocate a larger one */
 		if (pos >= bufsize) {
