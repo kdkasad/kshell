@@ -19,6 +19,7 @@ static void kshell_free_split_line(char **args);
 static int kshell_launch(char **args);
 static void kshell_loop(FILE *f);
 static char *kshell_read_line(FILE *f);
+static int kshell_process_line(char *line);
 static char **kshell_split_line(char *line);
 
 /*
@@ -83,7 +84,6 @@ int kshell_launch(char **args)
 void kshell_loop(FILE *f)
 {
 	char *line;
-	char **args;
 	char *prompt;
 	int status;
 
@@ -94,17 +94,12 @@ void kshell_loop(FILE *f)
 			fputs(prompt, stderr);
 		free(prompt);
 
-		/* read line and split into tokens */
+		/* read line and process it */
 		line = kshell_read_line(f);
 		if (!line)
 			return;
-		args = kshell_split_line(line);
+		status = kshell_process_line(line);
 		free(line);
-
-		/* interpret and run the line */
-		status = kshell_launch(args);
-
-		kshell_free_split_line(args);
 	} while (!status);
 }
 
@@ -159,6 +154,24 @@ char *kshell_read_line(FILE *f)
 			}
 		}
 	}
+}
+
+/*
+ * Process and run a line
+ */
+static int kshell_process_line(char *line)
+{
+	char **args;
+	int status;
+
+	args = kshell_split_line(line);
+
+	/* interpret and run the line */
+	status = kshell_launch(args);
+
+	kshell_free_split_line(args);
+
+	return status;
 }
 
 /*
@@ -224,17 +237,20 @@ no_home_dir_subst:
 
 int main(int argc, char *argv[])
 {
-
 	if (argc > 1) {
 		FILE *f;
 		for (int i = 1; i < argc; i++) {
-			f = fopen(argv[i], "r");
-			if (!f) {
-				fprintf(stderr, "unable to open file: %s\n", strerror(errno));
-				return 1;
+			if (!strcmp(argv[i], "-c")) {
+				kshell_process_line(argv[++i]);
+			} else {
+				f = fopen(argv[i], "r");
+				if (!f) {
+					fprintf(stderr, "unable to open file: %s\n", strerror(errno));
+					return 1;
+				}
+				kshell_loop(f);
+				fclose(f);
 			}
-			kshell_loop(f);
-			fclose(f);
 		}
 	} else {
 		kshell_loop(stdin);
