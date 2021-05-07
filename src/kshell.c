@@ -13,6 +13,7 @@
 #include "prompt.h"
 
 static int kshell_execute(char **args);
+static void kshell_free_split_line(char **args);
 static int kshell_launch(char **args);
 static void kshell_loop(FILE *f);
 static char *kshell_read_line(FILE *f);
@@ -45,6 +46,17 @@ int kshell_execute(char **args)
 }
 
 /*
+ * Free the list of arguments returned by kshell_split_line(...)
+ */
+void kshell_free_split_line(char **args)
+{
+	for (int i = 0; args[i]; i++) {
+		free(args[i]);
+	}
+	free(args);
+}
+
+/*
  * Perform the action of a command
  */
 int kshell_launch(char **args)
@@ -74,24 +86,23 @@ void kshell_loop(FILE *f)
 	int status;
 
 	do {
-		prompt = get_prompt_text();
-
 		/* print prompt if reading from a terminal */
+		prompt = get_prompt_text();
 		if (isatty(fileno(f)))
 			fputs(prompt, stderr);
+		free(prompt);
 
 		/* read line and split into tokens */
 		line = kshell_read_line(f);
 		if (!line)
 			return;
 		args = kshell_split_line(line);
+		free(line);
 
 		/* interpret and run the line */
 		status = kshell_launch(args);
 
-		free(line);
-		free(args);
-		free(prompt);
+		kshell_free_split_line(args);
 	} while (!status);
 }
 
@@ -151,29 +162,35 @@ char *kshell_read_line(FILE *f)
 /*
  * Split a line of input into a list of arguments
  *
- * Result must be freed.
+ * Each string in the returned array, as well as the array itself, must be
+ * freed by the caller. Use the helper function kshell_free_split_line(...) to
+ * do so.
  */
 char **kshell_split_line(char *line)
 {
 #define SL_BUFFER_SIZE 64
 #define SL_TOK_DELIM " \t\r\n\a"
 	
-	size_t bufsize = SL_BUFFER_SIZE, pos = 0;
-	char **tokens = calloc(bufsize, sizeof(char*));
 	char *token;
+	/* allocate buffer for array of tokens */
+	size_t bufsize = SL_BUFFER_SIZE, pos = 0;
+	char **tokens = calloc(bufsize, sizeof(char *));
 
 	if (!tokens) {
 		perror(PROGNAME": malloc");
 		exit(EXIT_FAILURE);
 	}
 
+	/* for each token in the line */
 	for (token = strtok(line, SL_TOK_DELIM); token;
 			token = strtok(NULL, SL_TOK_DELIM)) {
-		tokens[pos++] = token;
+		/* allocate a new string for the token */
+		tokens[pos++] = strdup(token);
 
+		/* if the token array is full, reallocate a larger one */
 		if (pos >= bufsize) {
 			bufsize += SL_BUFFER_SIZE;
-			tokens = realloc(tokens, bufsize);
+			tokens = realloc(tokens, bufsize * sizeof(char *));
 			if (!tokens) {
 				perror(PROGNAME": realloc");
 				exit(EXIT_FAILURE);
@@ -181,7 +198,9 @@ char **kshell_split_line(char *line)
 		}
 	}
 
+	/* terminate array */
 	tokens[pos] = NULL;
+
 	return tokens;
 }
 
