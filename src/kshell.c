@@ -12,6 +12,7 @@
 #include "macros.h"
 #include "paths.h"
 #include "prompt.h"
+#include "subst.h"
 
 static int kshell_execute(char **args);
 static void kshell_free_split_line(char **args);
@@ -192,15 +193,16 @@ char **kshell_split_line(char *line)
 				goto no_home_dir_subst;
 			/* no need to allocate extra space for a nul byte
 			 * because the '~' will be removed */
-			tokens[pos] = malloc(strlen(homedir) + strlen(token));
+			char *tmp = malloc(strlen(homedir) + strlen(token));
 			strcpy(tokens[pos], homedir);
 			strcat(tokens[pos], token + 1);
 			free(homedir);
-			pos++;
+			tokens[pos++] = do_substitutions(tmp);
+			free(tmp);
 		} else {
 no_home_dir_subst:
 			/* allocate a new string for the token */
-			tokens[pos++] = strdup(token);
+			tokens[pos++] = do_substitutions(token);
 		}
 
 		/* if the token array is full, reallocate a larger one */
