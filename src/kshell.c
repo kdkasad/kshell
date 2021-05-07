@@ -10,6 +10,7 @@
 
 #include "builtins/builtins.h"
 #include "macros.h"
+#include "paths.h"
 #include "prompt.h"
 
 static int kshell_execute(char **args);
@@ -186,15 +187,18 @@ char **kshell_split_line(char *line)
 			token = strtok(NULL, SL_TOK_DELIM)) {
 		if (token[0] == '~') {
 			/* replace '~' with home directory */
-			TODO("fall back to getting home dir from passwd db");
-			char *homedir = getenv("HOME");
+			char *homedir = get_home_dir();
+			if (!homedir)
+				goto no_home_dir_subst;
 			/* no need to allocate extra space for a nul byte
 			 * because the '~' will be removed */
 			tokens[pos] = malloc(strlen(homedir) + strlen(token));
 			strcpy(tokens[pos], homedir);
 			strcat(tokens[pos], token + 1);
+			free(homedir);
 			pos++;
 		} else {
+no_home_dir_subst:
 			/* allocate a new string for the token */
 			tokens[pos++] = strdup(token);
 		}

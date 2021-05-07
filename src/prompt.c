@@ -5,8 +5,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "prompt.h"
 #include "macros.h"
+#include "paths.h"
+#include "prompt.h"
 
 #define PROMPT_BUF_SIZ 256
 
@@ -37,9 +38,8 @@ char *get_prompt_text()
 		}
 
 		/* replace home dir with '~' */
-		TODO("fall back to getting home dir from passwd db");
-		char *home = getenv("HOME");
-		if (home && *home && !strncmp(prompt, home, strlen(home))) {
+		char *home = get_home_dir();
+		if (home && !strncmp(prompt, home, strlen(home))) {
 			memmove(prompt + 1, prompt + strlen(home), strlen(prompt));
 			prompt[0] = '~';
 		}
