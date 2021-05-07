@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -27,6 +28,16 @@ int kshell_builtin_cd(char **args)
 	if (chdir(dest) < 0) {
 		perror(PROGNAME": cd");
 		goto done;
+	}
+
+	/* update the $PWD and $OLDPWD environment variables */
+	char *cwd = malloc(PATH_MAX);
+	setenv("OLDPWD", getenv("PWD"), 1);
+	if (getcwd(cwd, PATH_MAX)) {
+		setenv("PWD", cwd, 1);
+		free(cwd);
+	} else {
+		setenv("PWD", dest, 1);
 	}
 
 done:
