@@ -4,8 +4,8 @@ PROGNAME := kshell
 SRCDIR   := src
 BUILDDIR := build
 
-CFLAGS  ?= -O2 -g
-CFLAGS  += -Wall -Wextra -pedantic -DPROGNAME=\"$(PROGNAME)\"
+CFLAGS  ?= -O3
+CFLAGS  += -Wall -Wextra -pedantic -DPROGNAME="\"$(PROGNAME)\""
 LDFLAGS ?= -s
 
 SRCS := $(wildcard $(SRCDIR)/*.c) $(wildcard $(SRCDIR)/builtins/*.c)
