@@ -5,7 +5,7 @@ SRCDIR   := src
 BUILDDIR := build
 
 CFLAGS  ?= -O3
-CFLAGS  += -Wall -Wextra -pedantic -DPROGNAME="\"$(PROGNAME)\""
+CFLAGS  += -Wall -Wextra -Wpedantic -DPROGNAME="\"$(PROGNAME)\""
 LDFLAGS ?= -s
 
 SRCS := $(wildcard $(SRCDIR)/*.c) $(wildcard $(SRCDIR)/builtins/*.c)
@@ -21,17 +21,17 @@ clean:
 
 .PHONY: install
 install: all
-	install -Dm0755 $(PROGNAME) $(DESTDIR)$(PREFIX)/bin/$(BIN)
+	install -Dm0755 $(PROGNAME) $(DESTDIR)$(PREFIX)/bin/$(PROGNAME)
 
 .PHONY: uninstall
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/$(PROGNAME)
 
 $(PROGNAME): $(OBJS)
-	$(CC) $(LDFLAGS) $^ $(LOADLIBES) $(LDLIBS) -o $@
+	$(CC) -o $@ $^ $(LDFLAGS) $(LOADLIBES) $(LDLIBS)
 
 $(BUILDDIR) $(BUILDDIR)/builtins:
 	mkdir -p $@
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c | $(BUILDDIR) $(BUILDDIR)/builtins
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
