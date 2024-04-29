@@ -8,8 +8,8 @@ struct builtin {
 	builtin_func *func;
 };
 
-int kshell_builtin_cd(char **args);
-int kshell_builtin_exit();
+int kshell_builtin_cd(char **);
+int kshell_builtin_exit(char **);
 
 extern struct builtin builtins[];
 extern int num_builtins;

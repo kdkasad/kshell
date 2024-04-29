@@ -12,7 +12,7 @@
  *
  * Returned string must be freed by the caller
  */
-char *get_home_dir()
+char *get_home_dir(void)
 {
 	char *homedir;
 

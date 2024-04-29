@@ -19,7 +19,7 @@
  *
  * The returned string is heap-allocated, and must be freed by the caller.
  */
-char *get_prompt_text()
+char *get_prompt_text(void)
 {
 	char *prompt;
 
