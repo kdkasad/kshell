@@ -82,15 +82,15 @@ int kshell_launch(char **args)
 void kshell_loop(FILE *f)
 {
 	char *line;
-	char *prompt;
 	int status;
 
 	do {
 		/* print prompt if reading from a terminal */
-		prompt = get_prompt_text();
-		if (isatty(fileno(f)))
+		if (isatty(fileno(f))) {
+			char *prompt = get_prompt_text();
 			fputs(prompt, stderr);
-		free(prompt);
+			free(prompt);
+		}
 
 		/* read line and process it */
 		line = kshell_read_line(f);
