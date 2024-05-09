@@ -35,6 +35,10 @@ int kshell_builtin_cd(char **args)
 
 	/* update the $PWD and $OLDPWD environment variables */
 	char *cwd = malloc(PATH_MAX);
+	if (!cwd) {
+		perror(PROGNAME": malloc");
+		exit(EXIT_FAILURE);
+	}
 	setenv("OLDPWD", getenv("PWD"), 1);
 	if (getcwd(cwd, PATH_MAX)) {
 		setenv("PWD", cwd, 1);

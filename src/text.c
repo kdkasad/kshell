@@ -20,10 +20,12 @@ char **kshell_split_line(char *line)
 #define SL_TOK_DELIM " \t\r\n\a"
 
 	char *token;
-	/* allocate buffer for array of tokens */
-	size_t bufsize = SL_BUFFER_SIZE, pos = 0;
-	char **tokens = calloc(bufsize, sizeof(char *));
+	/* buffer for array of tokens */
+	size_t bufsize = SL_BUFFER_SIZE;
+	size_t pos = 0;
+	char **tokens;
 
+	tokens = calloc(bufsize, sizeof(char *));
 	if (!tokens) {
 		perror(PROGNAME": malloc");
 		exit(EXIT_FAILURE);
@@ -41,6 +43,10 @@ char **kshell_split_line(char *line)
 			/* no need to allocate extra space for a nul byte
 			 * because the '~' will be removed */
 			char *tmp = malloc(strlen(homedir) + strlen(token));
+			if (!tmp) {
+				perror(PROGNAME": malloc");
+				exit(EXIT_FAILURE);
+			}
 			strcpy(tokens[pos], homedir);
 			strcat(tokens[pos], token + 1);
 			free(homedir);
@@ -57,7 +63,7 @@ no_home_dir_subst:
 			bufsize += SL_BUFFER_SIZE;
 			tokens = realloc(tokens, bufsize * sizeof(char *));
 			if (!tokens) {
-				perror(PROGNAME": realloc");
+				perror(PROGNAME": malloc");
 				exit(EXIT_FAILURE);
 			}
 		}

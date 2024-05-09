@@ -27,9 +27,17 @@ char *get_prompt_text(void)
 	char *ps1 = getenv("PS1");
 	if (ps1 && *ps1) {
 		prompt = malloc(strlen(ps1) + 1);
+		if (!prompt) {
+			perror(PROGNAME": malloc");
+			exit(EXIT_FAILURE);
+		}
 		strcpy(prompt, ps1);
 	} else {
 		prompt = malloc(PATH_MAX);
+		if (!prompt) {
+			perror(PROGNAME": malloc");
+			exit(EXIT_FAILURE);
+		}
 
 		/* store current directory into prompt */
 		if (getcwd(prompt, PATH_MAX - 4) == NULL) {

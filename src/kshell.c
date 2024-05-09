@@ -147,7 +147,7 @@ char *kshell_read_line(FILE *f)
 			bufsize += RL_BUFFER_SIZE;
 			buffer = realloc(buffer, bufsize);
 			if (!buffer) {
-				perror(PROGNAME": realloc");
+				perror(PROGNAME": malloc");
 				exit(EXIT_FAILURE);
 			}
 		}

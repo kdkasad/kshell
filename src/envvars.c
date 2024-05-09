@@ -13,7 +13,13 @@ char *subst_envvars(const char *str)
 
 	size_t bufsiz = SE_BUFSIZ;
 	size_t pos = 0;
-	char *res = calloc(bufsiz, sizeof(char));
+	char *res;
+
+	res = calloc(bufsiz, sizeof(char));
+	if (!res) {
+		perror(PROGNAME": malloc");
+		exit(EXIT_FAILURE);
+	}
 
 	/* start and end indices of the variable name/key */
 	size_t keystart, keyend;
@@ -61,6 +67,10 @@ done_scanning:
 				if (strlen(val) > bufsiz - pos) {
 					bufsiz = pos + strlen(val) + 1;
 					res = realloc(res, bufsiz);
+					if (!res) {
+						perror(PROGNAME": malloc");
+						exit(EXIT_FAILURE);
+					}
 				}
 				strcat(res, val);
 				pos += strlen(val);
@@ -76,7 +86,7 @@ done_scanning:
 			bufsiz += SE_BUFSIZ;
 			res = realloc(res, bufsiz);
 			if (!res) {
-				perror(PROGNAME": realloc");
+				perror(PROGNAME": malloc");
 				exit(EXIT_FAILURE);
 			}
 		}
