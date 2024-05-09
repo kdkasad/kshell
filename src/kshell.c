@@ -22,7 +22,7 @@ static int kshell_process_line(char *line);
 
 /*
  * Execute a program with the given arguments
- */ 
+ */
 int kshell_execute(char **args)
 {
 	pid_t pid;
@@ -152,6 +152,7 @@ char *kshell_read_line(FILE *f)
 			}
 		}
 	}
+#undef RL_BUFFER_SIZE
 }
 
 /*

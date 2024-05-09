@@ -18,7 +18,7 @@ char **kshell_split_line(char *line)
 {
 #define SL_BUFFER_SIZE 64
 #define SL_TOK_DELIM " \t\r\n\a"
-	
+
 	char *token;
 	/* allocate buffer for array of tokens */
 	size_t bufsize = SL_BUFFER_SIZE, pos = 0;
@@ -67,5 +67,7 @@ no_home_dir_subst:
 	tokens[pos] = NULL;
 
 	return tokens;
-}
 
+#undef SL_BUFFER_SIZE
+#undef SL_TOK_DELIM
+}

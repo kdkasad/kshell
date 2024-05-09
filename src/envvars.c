@@ -85,4 +85,7 @@ done_scanning:
 	res[pos] = '\0';
 
 	return res;
+
+#undef SE_BUFSIZ
+#undef SE_DELIM
 }
