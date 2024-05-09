@@ -1,12 +1,11 @@
-PREFIX = /usr/local
+PREFIX := /usr/local
 
 PROGNAME := kshell
 SRCDIR   := src
 BUILDDIR := build
 
-CFLAGS  ?= -O3
-CFLAGS  += -Wall -Wextra -Wpedantic -DPROGNAME="\"$(PROGNAME)\""
-LDFLAGS ?= -s
+CFLAGS := -O3 -Wall -Wextra -Wpedantic -std=c99
+CPPFLAGS := -DPROGNAME="\"$(PROGNAME)\""
 
 SRCS := $(wildcard $(SRCDIR)/*.c) $(wildcard $(SRCDIR)/builtins/*.c)
 OBJS := $(patsubst $(SRCDIR)/%.c,$(BUILDDIR)/%.o,$(SRCS))
