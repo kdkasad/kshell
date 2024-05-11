@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,8 +63,34 @@ void kshell_free_split_line(char **args)
  */
 int kshell_launch(char **args)
 {
-	if (!args[0])
-		return 0;
+	/* Perform variable assignment.
+	 * Currently exports every variable assigned as an environment variable;
+	 * There is no concept of shell-local variables. */
+	TODO("Don't just use environment variables");
+	char *eq;
+	unsigned char key_valid;
+	do {
+		if (!args[0])
+			return 0;
+
+		if ((eq = strchr(args[0], '='))) {
+			key_valid = 1;
+			for (char *c = args[0]; c < eq; c++) {
+				if (!(isalnum(*c) || *c == '_')) {
+					key_valid = 0;
+					break;
+				}
+			}
+
+			if (key_valid) {
+				*eq = '\0';
+				const char *key = args[0];
+				const char *value = eq + 1;
+				setenv(key, value, 1);
+				args++;
+			}
+		}
+	} while (eq && key_valid);
 
 	/* if the given command is a builtin, run that function */
 	for (int i = 0; i < num_builtins; i++) {
