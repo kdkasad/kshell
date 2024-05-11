@@ -24,20 +24,27 @@
 char *get_home_dir(const char *username)
 {
 	const struct passwd *pw;
+	const char *home = NULL;
 
 	if (!username) {
-		const char *home = getenv("HOME");
-		if (home && *home) {
-			return strdup(home);
-		} else {
+		home = getenv("HOME");
+		if (!(home && *home)) {
 			pw = getpwuid(geteuid());
 		}
 	} else {
 		pw = getpwnam(username);
 	}
 
-	if (!pw || !pw->pw_dir || !*pw->pw_dir)
-		return NULL;
+	if (!home) {
+		if (!pw || !pw->pw_dir || !*pw->pw_dir)
+			return NULL;
+		home = pw->pw_dir;
+	}
 
-	return strdup(pw->pw_dir);
+	char *res = strdup(home);
+	if (!res) {
+		perror(PROGNAME ": malloc");
+		exit(EXIT_FAILURE);
+	}
+	return res;
 }

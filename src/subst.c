@@ -35,9 +35,17 @@ char *subst_homedir(const char *str) {
 	* This is based off of what I think should work, not on any standards. */
 #define IS_NAME_CHAR(c) (isalnum(c) || ((c) == '_') || ((c) == '-'))
 
-	if (str[0] != '~')
+	char *res;
+
+	if (str[0] != '~') {
 error:
-		return strdup(str);
+		res = strdup(str);
+		if (!res) {
+			perror(PROGNAME": malloc");
+			exit(EXIT_FAILURE);
+		}
+		return res;
+	}
 
 	size_t namelen = 0;
 	char *username = NULL;
@@ -63,7 +71,7 @@ error:
 
 	/* We don't need an extra byte for the NUL terminator because the '~' will
 	 * be replaced. */
-	char *res = malloc(strlen(str) - namelen + strlen(homedir));
+	res = malloc(strlen(str) - namelen + strlen(homedir));
 	strcpy(res, homedir);
 	strcat(res, str + 1 + namelen);
 
