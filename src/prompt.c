@@ -51,6 +51,7 @@ char *get_prompt_text(void)
 			memmove(prompt + 1, prompt + strlen(home), strlen(prompt));
 			prompt[0] = '~';
 		}
+		free(home);
 
 		/* append '#' for root or '$' for any other user */
 		if (geteuid() == 0)
