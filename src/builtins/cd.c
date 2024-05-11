@@ -28,9 +28,14 @@ int kshell_builtin_cd(char **args)
 		dest = args[1];
 	}
 
-	if (chdir(dest) < 0) {
+	int chdir_ret = chdir(dest);
+
+	if (!args[1])
+		free(dest);
+
+	if (chdir_ret < 0) {
 		perror(PROGNAME": cd");
-		goto done;
+		return 0;
 	}
 
 	/* update the $PWD and $OLDPWD environment variables */
@@ -46,10 +51,6 @@ int kshell_builtin_cd(char **args)
 	} else {
 		setenv("PWD", dest, 1);
 	}
-
-done:
-	if (!args[1])
-		free(dest);
 
 	return 0;
 }

@@ -32,5 +32,5 @@ $(PROGNAME): $(OBJS)
 $(BUILDDIR) $(BUILDDIR)/builtins:
 	mkdir -p $@
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.c | $(BUILDDIR) $(BUILDDIR)/builtins
+$(OBJS): $(BUILDDIR)/%.o: $(SRCDIR)/%.c | $(BUILDDIR) $(BUILDDIR)/builtins
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
