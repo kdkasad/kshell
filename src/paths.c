@@ -8,7 +8,10 @@
 #include "paths.h"
 
 /*
- * Get the user's home directory
+ * Get the user's home directory.
+ *
+ * Checks the $HOME environment variable first, then falls back to
+ * getting the passwd entry for the current user.
  *
  * Returned string must be freed by the caller
  */
