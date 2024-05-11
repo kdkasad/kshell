@@ -1,6 +1,6 @@
 #include "builtins.h"
 
-struct builtin builtins[] = {
+const struct builtin builtins[] = {
 	{
 		.name = "cd",
 		.func = &kshell_builtin_cd,
@@ -11,4 +11,4 @@ struct builtin builtins[] = {
 	},
 };
 
-int num_builtins = sizeof(builtins) / sizeof(*builtins);
+const int num_builtins = sizeof(builtins) / sizeof(*builtins);

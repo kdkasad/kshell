@@ -11,7 +11,7 @@ struct builtin {
 int kshell_builtin_cd(char **);
 int kshell_builtin_exit(char **);
 
-extern struct builtin builtins[];
-extern int num_builtins;
+extern const struct builtin builtins[];
+extern const int num_builtins;
 
 #endif /* BUILTINS_BUILTINS_H */
