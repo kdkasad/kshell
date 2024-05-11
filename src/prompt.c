@@ -8,6 +8,7 @@
 #include "macros.h"
 #include "paths.h"
 #include "prompt.h"
+#include "string.h"
 
 #define PROMPT_BUF_SIZ 256
 
@@ -27,10 +28,6 @@ char *get_prompt_text(void)
 	char *ps1 = getenv("PS1");
 	if (ps1 && *ps1) {
 		prompt = strdup(ps1);
-		if (!prompt) {
-			perror(PROGNAME": malloc");
-			exit(EXIT_FAILURE);
-		}
 	} else {
 		/* Path + " $ " + NUL terminator */
 		prompt = malloc(PATH_MAX + 4);

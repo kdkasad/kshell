@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 #include "paths.h"
+#include "string.h"
 
 /*
  * Get the given user's home directory.
@@ -41,10 +42,5 @@ char *get_home_dir(const char *username)
 		home = pw->pw_dir;
 	}
 
-	char *res = strdup(home);
-	if (!res) {
-		perror(PROGNAME ": malloc");
-		exit(EXIT_FAILURE);
-	}
-	return res;
+	return strdup(home);
 }

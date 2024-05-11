@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "envvars.h"
+#include "string.h"
 
 /*
  * Perform variable substitution on a string.
