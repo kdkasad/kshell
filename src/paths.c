@@ -8,29 +8,36 @@
 #include "paths.h"
 
 /*
- * Get the user's home directory.
+ * Get the given user's home directory.
  *
- * Checks the $HOME environment variable first, then falls back to
- * getting the passwd entry for the current user.
+ * If the username argument is a NULL pointer, the home directory of the current
+ * user is found.
  *
- * Returned string must be freed by the caller
+ * For the current user, the $HOME environment variable is checked first, and
+ * the passwd database is used as a fallback.
+ *
+ * For other users, the passwd database is used.
+ *
+ * Returns NULL if the home directory cannot be resolved.
+ * Returned string must be freed by the caller.
  */
-char *get_home_dir(void)
+char *get_home_dir(const char *username)
 {
-	char *homedir;
+	const struct passwd *pw;
 
-	/* attempt to get home dir from environment variables */
-	homedir = getenv("HOME");
-	if (homedir && *homedir)
-		return strdup(homedir);
-
-	/* get home dir from passwd db */
-	struct passwd *pwent = getpwuid(geteuid());
-	if (!pwent) {
-		perror(PROGNAME": getpwuid");
-		return NULL;
+	if (!username) {
+		const char *home = getenv("HOME");
+		if (home && *home) {
+			return strdup(home);
+		} else {
+			pw = getpwuid(geteuid());
+		}
+	} else {
+		pw = getpwnam(username);
 	}
-	return strdup(pwent->pw_dir);
 
-	return homedir;
+	if (!pw || !pw->pw_dir || !*pw->pw_dir)
+		return NULL;
+
+	return strdup(pw->pw_dir);
 }

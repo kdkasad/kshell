@@ -46,7 +46,7 @@ char *get_prompt_text(void)
 		}
 
 		/* replace home dir with '~' */
-		char *home = get_home_dir();
+		char *home = get_home_dir(NULL);
 		if (home && !strncmp(prompt, home, strlen(home))) {
 			memmove(prompt + 1, prompt + strlen(home), strlen(prompt));
 			prompt[0] = '~';

@@ -16,7 +16,7 @@ int kshell_builtin_cd(char **args)
 
 	if (!args[1]) {
 		/* if no directory given, go to home directory */
-		dest = get_home_dir();
+		dest = get_home_dir(NULL);
 		if (!dest) {
 			fputs(PROGNAME": unable to get home directory\n", stderr);
 			return 0;
