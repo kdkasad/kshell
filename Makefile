@@ -4,7 +4,7 @@ PROGNAME := kshell
 SRCDIR   := src
 BUILDDIR := build
 
-CFLAGS := -O3 -Wall -Wextra -Wpedantic -Werror -std=c99
+CFLAGS := -O3 -Wall -Wextra -Wpedantic -Werror -std=c99 -D_POSIX_C_SOURCE=200112L
 CPPFLAGS := -DPROGNAME="\"$(PROGNAME)\""
 
 SRCS := $(wildcard $(SRCDIR)/*.c) $(wildcard $(SRCDIR)/builtins/*.c)
