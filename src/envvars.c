@@ -50,18 +50,13 @@ char *subst_envvars(const char *str)
 			if (str[i + 1] == '{') {
 				/* if using ${VAR} syntax, scan to matching '}' */
 				keystart = i + 2;
-				size_t j;
-				for (j = keystart; j < input_strlen; j++) {
-					if (str[j] == '}') {
-						keyend = j;
-						repend = j + 1;
-						break;
-					}
-				}
-				if (j == input_strlen) {
+				const char *rbrace = strchr(str + keystart, '}');
+				if (!rbrace) {
 					fputs(PROGNAME": invalid syntax: expected '}'\n", stderr);
 					return NULL;
 				}
+				keyend = rbrace - (str + keystart);
+				repend = keyend + 1;
 			} else {
 				/* using $VAR syntax, scan until whitespace or end of string */
 				keystart = i + 1;
@@ -90,6 +85,7 @@ char *subst_envvars(const char *str)
 				strcat(res, val);
 				pos += val_len;
 			}
+			/* -1 because i++ at end of loop */
 			i = repend - 1;
 		} else {
 			/* append character to result string */
